@@ -1,10 +1,34 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import Display from "./components/Display"
+import Keypad from './components/Keypad'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [input, setInput] = useState(0);
+
+  function handleClick(e) {
+    const char = e.target.label;
+    const last = input.slice(-1);
+    const lastTwo = input.slice(-2);
+
+    if (char === "C") {
+      return setInput(0);
+    }
+
+    if ("+-x/".includes(char) && "+-x/".includes(last)) {
+      if (/[+x/]-/.test(lastTwo)) {
+        setInput(input.slice(0, -2) + char);
+        return;
+      }
+      setInput(input.slice(0, -1) + char);
+      return;
+    }
+
+    if(char === "-" && /--$/.test(lastTwo)) return;
+    if(char === "-"&& /[+x/]-$/.test(lastTwo)) return;
+
+    
+  }
 
   return (
     <>

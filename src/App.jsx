@@ -1,21 +1,28 @@
 import { useState } from 'react'
 import Display from "./components/Display"
 import Keypad from './components/Keypad'
+import { evaluateExpr } from './utils/calculatorLogic'
 import './App.css'
 
 function App() {
-  const [input, setInput] = useState(0);
+  const [input, setInput] = useState("0");
 
   function handleClick(e) {
-    const char = e.target.label;
+    const char = e.target.innerText;
     const last = input.slice(-1);
     const lastTwo = input.slice(-2);
 
-    if (char === "C") {
-      return setInput(0);
+    if ("+x/".includes(char) && (/^[0=]/.test(input) || /^[+x/]/.test(input))) {
+      console.log("Input starts with 0 or =.")
+      setInput("0");
+      return;
     }
 
-    if ("+-x/".includes(char) && "+-x/".includes(last)) {
+    if (char === "C") {
+      return setInput("0");
+    }
+
+    if ("+x/".includes(char) && "+-x/".includes(last)) {
       if (/[+x/]-/.test(lastTwo)) {
         setInput(input.slice(0, -2) + char);
         return;
@@ -24,35 +31,41 @@ function App() {
       return;
     }
 
-    if(char === "-" && /--$/.test(lastTwo)) return;
+    if(char === "-" && /\-\-$/.test(lastTwo)) {
+      console.log("Char: ", char);
+      console.log("lastTwo: ", lastTwo);
+      return;
+    };
     if(char === "-"&& /[+x/]-$/.test(lastTwo)) return;
 
+    if (char === ".") {
+      const operands = input.split(/[+\-x/]/g);
+      console.log("operands: ",operands)
+      if(operands[operands.length -1].includes(".") || (!/[+\-x/]/.test(input) && input.includes("."))) {
+        console.log('"!"+-x/".includes(input): ', "TEST");
+        return;
+      };
+    }
     
+    setInput(input === "0" || /=/.test(input) ? char : input + char);
+  }
+
+  function handleEqualsClick (e) {
+    if (e.target.innerText === "=") {
+      try { 
+        const result = evaluateExpr(input);
+        setInput(String(result));
+      } catch {
+        setInput("Error");
+      }
+    }
   }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="container">
+      <Display input={input} />
+      <Keypad onInput={handleClick} onEquals={handleEqualsClick} />
+    </div>
   )
 }
 

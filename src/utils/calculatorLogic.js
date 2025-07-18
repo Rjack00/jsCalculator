@@ -81,7 +81,7 @@ export function evaluatePostfix(postfix) {
       }
     }
   }
-  return stack[0];
+  return `= ${stack[0]}`;
 }
 
 export function evaluateExpr (expr) {

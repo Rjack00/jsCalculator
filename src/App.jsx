@@ -12,6 +12,11 @@ function App() {
     const last = input.slice(-1);
     const lastTwo = input.slice(-2);
 
+    if (/=/.test(input) && "+x-/".includes(char)) {
+      setInput(input.slice(2) + char);
+      return;
+    }
+
     if ("+x/".includes(char) && (/^[0=]/.test(input) || /^[+x/]/.test(input))) {
       console.log("Input starts with 0 or =.")
       setInput("0");
@@ -54,7 +59,7 @@ function App() {
     if (e.target.innerText === "=") {
       try { 
         const result = evaluateExpr(input);
-        setInput(String(result));
+        setInput(result);
       } catch {
         setInput("Error");
       }
